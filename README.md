@@ -219,7 +219,7 @@
   - 동일한 변수 이름이 존재할 때, 마지막에 선언된 값이 최종 결과값이 됨. 하지만, `!default`로 선언하게 되면 그 값은 기본값 즉 첫번째 값이 되어, 해당 변수에 다른 값이 지정되면, 최종값은 `!default`로 지정된 값이 아닌, 마지막에 선언된 값이 결과값으로 됨.
 
 ---
-### @ 규칙과 지시어
+### 규칙과 지시어
 1. **@import**
   - css 파일들을 별도의 모듈로 만들어 파일로 불러 올 수 있음.
   - 해당 파일명에는 일반 파일명도 있을 수 있고, 경로, URL을 통해 불러 올 수도 있음.
@@ -301,6 +301,205 @@
 - 처음부터 사용 X, 수정시 사용하는 것.
 
 ---
+### 제어문 및 표현식
+1. **if(...)**
+- 참과 거짓에 대한 조건에 따라 정의를 하는 곳에만 사용.
+```
+  if(true, 1px, 2px) => 1px
+  if(false, 1px, 2px) => 2px
+```
 
+2. **@if**
+- 참에 대한 값에만 결과값을 주는 것을 의미
+- @if - @else if
+```css
+  $weight:bold;
+  .txt1{
+    @if $weight == bold{font-weight:bold;} //해당조건 만족
+    @else if $weight == light {font-weight:100;}
+    @else if $weight == heavy {font-weight:900;}
+    @else {font-weight:normal;}  
+  }
+```
 
-테스트입니다.
+3. **@for**
+- 시작과 끝이 있는 구문
+- `@for $var from <start> through <end>`
+  ```css
+    /*SASS*/
+    @for $i from 1 though 3{
+      .col#{$i} { width:(100/5*$i)+px; }
+    }
+  ```
+  ```css
+    /*CSS*/
+    .col1 { width:20px; }
+    .col2 { width:40px; }
+    .col3 { width:60px; }
+  ```
+
+4. **@each**
+- 여러 개의 값을 변수에 각각 대입하는 것을 의미
+- `@each $var in 변수값1, 변수값2, 변수값3, ...`
+```css
+  /*SASS*/
+  @eash $usr in hj, js, yj{
+    .#{$usr}-img{ background-image: url('/img/#{$usr}.png'); }
+  }
+
+  /*map 속성이용*/
+  $map : (usr1:hj, usr2:js, usr3:yj);
+  @each $key, $usr in $map{
+    .#{$usr}-img{ background-image: url('/img/#{$usr}.png'); }
+  }
+```
+```css
+  /*CSS*/
+  .hj-img { background-image: url('/img/hj.png'); }
+  .js-img { background-image: url('/img/js.png'); }
+  .yj-img { background-image: url('/img/yj.png'); }
+```
+
+- `@each`는 한 개 이상의 변수값을 지정할 수 있음.
+```css
+  /*SASS*/
+  @each $usr, $color, $value in (hj, black, 1), (js, red, 2), (yj, blue, 3){
+    .#{$usr}-img{
+      background-image: url('/img/#{$usr}.png');
+      border $value+px solid $color;
+    }
+  }
+  /*map 속성이용*/
+  $hj : (hj, black, 1);
+  $js : (js, red, 2);
+  $yj : (yj, blue, 3);
+  @each $usr, $color, $value in $hj, $js, $yj{
+    .#{$usr}-img{
+      background-image: url('/img/#{$usr}.png');
+      border $value+px solid $color;
+    }
+  }
+```
+```css
+  /*CSS*/
+  .hj-img { background-image: url('/img/hj.png'); border: 1px solid black;}
+  .js-img { background-image: url('/img/js.png'); border: 2px solid red;}
+  .yj-img { background-image: url('/img/yj.png'); border: 3px solid blue;}
+```
+
+5. **@while**
+- 어떠한 조건을 충족할 때까지 값을 반복하는 것을 의미
+```CSS
+  $i:1;
+  @while $i <5{
+    css 속성;
+    $i : $i +1;
+  }
+```
+```css
+  /*SASS*/
+  $i:1;
+  @while $i < 3{
+    .col#{$i}{width:50*$i +px}
+    $i : $i +1;
+  }
+```
+```css
+  /*CSS*/
+  .col1{width:50px;}
+  .col2{width:100px;}
+  .col3{width:150px;}
+```
+---
+### Mixin
+- 반복적으로 사용되는 부분을 미리 설정해 놓고 새롭게 만드는 선택자에 해당 mixin을 호출.
+```CSS
+  @mixin boldtext($size, $color){
+    font:{
+      family: 'Malgun Gothic', sans-serif;
+      weight: bold;
+      size: $size;
+    }
+  }
+
+  .box1{
+    @include boldtext(24px, #000);
+  }
+
+  .box2{
+    @include boldtext($color:red, $size:36px); //변수명과 값을 같이 써주게 되면, 값의 위치 변경 가능.
+  }
+```
+- 벤더 프리픽스에 활용하여 사용
+  - 크롬/사파리 `-webkit-`
+  - 파이어폭스 `-moz-`
+  - 인터넷 익스플로러 `-ms-`
+  - 오페라  `-o-`
+
+- text-shadow와 box-shadow와 같이 값을 여러번 적용할때 사용
+```
+  @mixin box-shadow($shadows...){
+    -moz-box-shadow:$shadows;
+    -webkit-shadow:$shadows;
+    box-shadow:$shadows;
+  }
+  .shadows{
+    @include box-shadow(0px 4px 5px #666, 2px 6px 10px #999);
+  }
+```
+```
+  @mixin colors($text, $background, $border){
+    color: $text;
+    background: $background;
+    border-color: $border;
+  }
+  $values: #ff000, #00ff00, #0000ff;
+
+  .primary{
+    @include color($values...);
+  }
+
+  $value-map (text: #00ff00, background: #0000ff, border: #ff0000);
+  .secondary{
+    @include colors(value-map...);
+  }
+```
+- **@content** : mixin에 정의되지 않은 값을 추가할때 사용 (★응용고민해보기)
+```
+  /*SASS*/
+  @mixin conbox{
+    header{ height: 100px;
+      @content;
+    }
+  }
+
+  @include conbox{
+    #logo{ border:1px solid red; }
+  }
+```
+```
+  /*CSS*/
+    header{ height: 100px;}
+    header #logo{ border:1px solid red; }
+  }
+```
+```
+  @mixin txt($weight){
+    color: white;
+    @if $weight == bold {font-weight:bold;}
+    @else if $weight == light {font-weight:100;}
+    @else if $weight == heavy {font-weight:900;}
+    @else {font-weight:normal;}
+  }
+  .txt1 { @include txt(bold); }
+  .txt2 { @include txt(light); }
+  .txt3 { @include txt(heavy); }
+  .txt4 { @include txt(none); }
+  .txt5 { @include txt(normal); }
+```
+---
+### Output style
+1. Nested : 중첩스타일
+2. Expand : 가장 보기에 좋은 결과물.
+3. Compact : CSS 속성을 한줄에 보여줌.
+4. Compressed : **.min.** 형태
