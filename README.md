@@ -1,10 +1,10 @@
 ## SASS (Syntactically Awesome Style Sheet)
 [참고] https://sass-lang.com/
 
-### ATOM - SASS 설치하기
-[설치 참고] https://serpiko.tistory.com/629
+### VScode 연동
+- 
 
-### SCSS / SASS 차이점
+### SCSS / SASS 차이점ㅌ
 - SCSS : 중괄호 `{}` / 세미콜론 `;` 有
 - SASS : 無
 
