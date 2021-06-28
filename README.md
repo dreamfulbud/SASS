@@ -2,7 +2,7 @@
 [참고] https://sass-lang.com/
 
 ### VScode 연동
-- 
+- 연동?
 
 ### SCSS / SASS 차이점ㅌ
 - SCSS : 중괄호 `{}` / 세미콜론 `;` 有
