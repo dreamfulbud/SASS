@@ -1,17 +1,20 @@
 ## SASS (Syntactically Awesome Style Sheet)
 [참고] https://sass-lang.com/
 
-### VScode 연동
-- 연동?
+## VS Code
+- Open Preview 단축키 :  `Command + Shift + V`
 
-### SCSS / SASS 차이점ㅌ
+
+### SCSS / SASS 차이점
 - SCSS : 중괄호 `{}` / 세미콜론 `;` 有
 - SASS : 無
 
-### 변수(Variables)
-- `$` 변수 정의   
 
-  ```css
+### 변수(Variables)
+- `$` 변수 정의 : 반복적으로 사용되는 값을 변수로 지정
+- `$변수이름 : 속성값;`
+- 선언된 블록 `{}` 내에서만 유효범위를 가진다.
+  ```scss
     $font: Helvetica, sans-serif;
     $color: #333;
 
@@ -20,11 +23,24 @@
       color: $color;
     }
   ```
+- 변수 재할당 : 변수에 변수를 할당 할 수 있음
+  ```scss
+    $red : #ff0000;
+    $blue : #000ff;
+
+    $color-primary : $blue;
+    $color-danger : $red;
+
+    .box{
+      color: $color-primary;
+      background: $color-danger;
+    }
+  ```
 
 ### 중첩(Nesting)
 - 중괄호`{}`를 이용하여 중첩 처리   
 
-  ```css
+  ```scss
     $color: #333;
     $color2: red;
     section{
@@ -38,11 +54,47 @@
     }
   ```
 
+- `&` 이용
+  ```scss
+  .fs{
+    &-small{
+      font-size:14px;
+    }
+    &-medium{
+      font-size:16px;
+    }
+    &-large{
+      font-size:24px;
+    }
+  }
+  ```
+
+### `#{}`문자보간
+- `#{}`를 이용해서 코드의 어디든지 변수 값을 넣을 수 있음
+  ```scss
+    $family : unquote("Droid+Sans");
+    @import url("http://fonts.googleapis.com/css?family=#{family}");
+  ```
+  ```css
+    @import url("http://fonts.googleapis.com/css?family=Droid+Sans");
+
+  ```
+  ```
+    * Sass의 내장함수 unquote()는 문자에서 따옴표를 제거함.
+  ```
+
 ### 부분화(Partials) / 불러오기(Import)
 - 부분화 파일 생성 `_base.scss`
   - 앞 부분에 언더바 `_`
-- 부분화 파일 불러오기 `@import 'base';`
+  - 별도의 파일로 컴파일 되지 않고 사용됨.
+- 부분화 파일 불러오기 `@import 'base', 'main';`
   - 확장자 없음. 언더바`_` 사용 X
+  - 여러 파일을 가져올수 도 있음 `,`로 구분
+- 순수 css 문법으로 `@import`로 사용하는 상황 
+  - 파일 확장자가 `.css`일때
+  - 파일 이름이 `http://`로 시작하는 경우
+  - `url()` 이 붙었을 경우
+  - 미디어쿼리가 있는 경우
 
 ### 믹스인(Mixins)
 - 브라우저별 접두사를 처리하거나 반복적인 속성을 손쉽게 처리할 수 있게 해주는 역할.
@@ -62,12 +114,24 @@
 ### 확장(Extend) / 상속(Inheritance)
 - 중복되는 부분을 묶어서 사용   
 
-  ```css
+  ```scss
     .class{ border:1px solid #ccc; padding:8px; color:#333;}
 
     .box1{ @extend .class; border-color: green;}
     .box2{ @extend .class; border-color: yellow;}
   ```
+  ```css
+    .class, .box1, .box2{ border:1px solid #ccc; padding:8px; color:#333;}
+    .box1{ border-color: green;}
+    .box2{ border-color: yellow;}
+  ```
+
+- 컴파일 결과 :  `,`로 구분하는 다중선택지가 만들어짐
+- 고려사항
+  - 내 현재 선택자가 어디에 첨부될 것인가?
+  - 원치 않는 부작용이 초래될 수도 있는가?
+  - 이 한번에 확장으로 얼마나 큰 css가 생성되는가?
+- **Mixin을 대체기능으로 사용하는 것을 추천**
 
 ### 연산자(Operators)
 - 사칙연산 `+`, `-`, `*`, `/` 처리 가능.
@@ -80,7 +144,6 @@
     }
 
   ```
-
 
 ---
 
@@ -142,20 +205,19 @@
 - **1.전역변수**
   - 선택자 외부에 별도로 선언을 하거나, 지역변수 부분에 `!global`이라고 지정
 - **2.지역변수**
-
-```CSS
-  $max-width:100%; /*전역변수, 별도 _variables.css 파일을 만들어 분리하는 것이 좋음. */
-  .container{
-    $width: 2px !global; /* 내부에서 사용하다가 전역변수로 선언하고 싶을 때*/
-    border:$width*5 solid #ddd;
-    $bg-color: #f5f5f5; /*지역변수*/
-    background-color: $bg-color;
-    width: $max-width/2;
-  }
-```
-```
-  (!참고) SASS에서 하이픈(-) 언더바(_) 둘 모두 동일한 기호로 인식!
-```
+  ```CSS
+    $max-width:100%; /*전역변수, 별도 _variables.css 파일을 만들어 분리하는 것이 좋음. */
+    .container{
+      $width: 2px !global; /* 내부에서 사용하다가 전역변수로 선언하고 싶을 때*/
+      border:$width*5 solid #ddd;
+      $bg-color: #f5f5f5; /*지역변수*/
+      background-color: $bg-color;
+      width: $max-width/2;
+    }
+  ```
+  ```
+    (!참고) SASS에서 하이픈(-) 언더바(_) 둘 모두 동일한 기호로 인식!
+  ```
 
 ### SassScript
 - 사칙연산 가능.
@@ -182,18 +244,34 @@
 ### 연산
 1. 숫자 연산
  - `+ - / * == != < > <= >=`
- - 예외) font 속성 `/`
-  ```CSS
-    a{ font:10px/8px; } /* font-size:10px; line-height:8px; */
-  ```
+ - `*` : 하나 이상의 값이 반드시 숫자 ex) 10px * 10 **10px * 10px 에러!**
+ - `/` : 오른쪽 값이 반드시 숫자 ex) 10px/2
+    - 예외) font 속성 `/`
+      ```CSS
+        a{ font:10px/8px; } /* font-size:10px; line-height:8px; */
+      ```
+    - `/` 나누기 연산 기능으로 사용하려면 다음과 같은 조건 충족
+      - 값 또는 그 일부가 변수에 저장되거나 함수에 의해 반환되는 경우.
+      - 값이 `()`로 묶여있는 경우
+      - 값이 다른 산술 표현식의 일부로 사용되는 경우 (ex. 더하기 연산과 같이 사용)
+- 상대적 단위의 연산의 경우 `clac()`로 연산
 2. 색상 연산
-  - 알파값은 더하거나 빼더라도 연산이 되지 않음.
+  - RGBA의 Alpha 값은 더하거나 빼더라도 연산이 되지 않으며, 서로 동일해야 다른 값의 연산이 가능함.
+  - Alpha 값을 연산하기 위한 다음과 같은 색상 함수를 사용할수 있음.
+    - `opacify()`, `transparentize()`
+    ```scss
+      $color : rgba(10, 20, 30, .5)
+      color : opacify($color, .3); //30% 더 불투명하게 / 0.5 +0.3
+      background-color : transparentize($color, .2) //20% 더 투명하게 / 0.5 - 0.2
+    ```
 3. 문자열 연산
   - 보통 `+` 기호를 이용해서 결합.
   ```CSS
     p::before{ content: "Foo " + Bar;}
   ```
-4. 삽입
+4. 논리 연산
+  - and : 그리고 / or : 또는 / not : 부정 
+5. 삽입
   - 변수명 자체를 불러오려는 경우 삽입을 이요하여 철.
   - `#{변수명}`
   ```CSS
@@ -217,6 +295,8 @@
   - 삽입을 이용하면 CSS의 속성값 뿐만 아니라 문자열까지 다양하게 처리 가능.
 5. 변수 기본값 설정 `!default`
   - 동일한 변수 이름이 존재할 때, 마지막에 선언된 값이 최종 결과값이 됨. 하지만, `!default`로 선언하게 되면 그 값은 기본값 즉 첫번째 값이 되어, 해당 변수에 다른 값이 지정되면, 최종값은 `!default`로 지정된 값이 아닌, 마지막에 선언된 값이 결과값으로 됨.
+  - 변수와 값을 설정하겠지만, 혹시 기존 변수가 있을 경우는 현재 설정하는 변수의 값은 사용하지 않겠다.
+
 
 ---
 ### 규칙과 지시어
@@ -287,23 +367,81 @@
 - 독립된 선택자로 끌어올려야 하는 경우 사용.
 - 해당 선택자 사용 시 부모선택자의 위치로 이동
 ```css
-  .type{ padding-top:10px;
+  .type{ 
+    $width:100px;
+    $height:200px;
+    
+    padding-top:10px;
+
+    .item{
+      width:$width;
+      height:$height;
+    }
     @at-root .box{
-      background: #eee; padding:10px;
+      width:$width;
+      height:$height;
+      background: #eee; 
+      padding:10px;
     }
   }
   /* 결과값
   .type{ padding-top:10px;}
-  .box{ background: #eee; padding:10px;}
+  .type .item{  width:100px; height:200px;}
+
+  .box{ width:100px; height:200px; background: #eee; padding:10px;}
   */
 ```
 - ex) `@at-root(without:media)`- 해당 선택자와 지정한 속성은 @media 내부에서 제거되어 부모선택자로 지정.
 - 처음부터 사용 X, 수정시 사용하는 것.
 
 ---
+## 함수
+- **연산된 특정 값**을 `@return` 지시어를 통해 반환
+  ```scss
+    @function 함수이름($매개변수){
+      @return 값
+    }
+  ```
+  ```scss
+    @function colums($numbers:1, $columns:12, $width:1200px){
+      @return $width * ($numbers / $columns);
+    }
+    .container{
+      $width:1200px;
+      width:$width;
+      .item:nth-child(1){
+        width:colums();
+      }
+      .item:nth-child(2){
+        width:colums(8);
+      }
+      .item:nth-child(3){
+        width:colums(3);
+      }
+    }
+  ```
+  ```css
+    /* CSS 결과 */
+    .container {
+      width: 1200px;
+    }
+    .container .item:nth-child(1) {
+      width: 100px;
+    }
+    .container .item:nth-child(2) {
+      width: 800px;
+    }
+    .container .item:nth-child(3) {
+      width: 300px;
+    }
+  ```
+- 동일한 이름의 내장함수가 이미 있을 수 있음! 접두어를 붙여 만들기. ex) cumstom-my-red()
+
+
 ### 제어문 및 표현식
 1. **if(...)**
 - 참과 거짓에 대한 조건에 따라 정의를 하는 곳에만 사용.
+- `if(조건, 표현식1, 표현식2)` 삼항연산자와 유사.
 ```
   if(true, 1px, 2px) => 1px
   if(false, 1px, 2px) => 2px
@@ -312,7 +450,7 @@
 2. **@if**
 - 참에 대한 값에만 결과값을 주는 것을 의미
 - @if - @else if
-```css
+```scss
   $weight:bold;
   .txt1{
     @if $weight == bold{font-weight:bold;} //해당조건 만족
@@ -341,7 +479,7 @@
 4. **@each**
 - 여러 개의 값을 변수에 각각 대입하는 것을 의미
 - `@each $var in 변수값1, 변수값2, 변수값3, ...`
-```css
+```scss
   /*SASS*/
   @eash $usr in hj, js, yj{
     .#{$usr}-img{ background-image: url('/img/#{$usr}.png'); }
@@ -361,7 +499,7 @@
 ```
 
 - `@each`는 한 개 이상의 변수값을 지정할 수 있음.
-```css
+```scss
   /*SASS*/
   @each $usr, $color, $value in (hj, black, 1), (js, red, 2), (yj, blue, 3){
     .#{$usr}-img{
@@ -389,14 +527,14 @@
 
 5. **@while**
 - 어떠한 조건을 충족할 때까지 값을 반복하는 것을 의미
-```CSS
+```scss
   $i:1;
   @while $i <5{
     css 속성;
     $i : $i +1;
   }
 ```
-```css
+```scss
   /*SASS*/
   $i:1;
   @while $i < 3{
@@ -411,9 +549,22 @@
   .col3{width:150px;}
 ```
 ---
-### Mixin
+### Mixin (@mixin - @include)
 - 반복적으로 사용되는 부분을 미리 설정해 놓고 새롭게 만드는 선택자에 해당 mixin을 호출.
-```CSS
+- 매개변수(Parameters)란, 변수의 한 종류로, 제공되는 여러 데이터 중 하나를 가르키기 위해 사용된다.
+- 제공되는 여러 데이터들을 전달인수(argumanet)라고 부른다.
+```scss
+  @mixin 믹스인이름($매개변수1 : 기본값1, $매개변수2 : 기본값2...){ //기본값 설정
+    스타일;
+  }
+  .class{
+    @include 믹스인이름; //지정된 인수가 없을경우 기본값으로 설정됨.
+  }
+  .class{
+    @include 믹스인이름($매개변수2 : 새로운값); //키워드 인수
+  }
+```
+```scss
   @mixin boldtext($size, $color){
     font:{
       family: 'Malgun Gothic', sans-serif;
@@ -430,6 +581,50 @@
     @include boldtext($color:red, $size:36px); //변수명과 값을 같이 써주게 되면, 값의 위치 변경 가능.
   }
 ```
+- 가변인수 : 매개변수 뒤 `...`
+  ```scss
+    @mixin var ($w, $h, $bg...){
+      width:$w;
+      height:$h;
+      background:$bg;
+    }
+
+    .box{
+      @include var(
+        100px, 
+        200px, 
+        url("img/a.png") no-repeat 10px 20px,
+        url("img/b.png") no-repeat,
+        url("img/c.png") ,
+      );
+    }
+  ```
+  ```scss
+    @mixin font($style:normal, $weight:normal, $size:16px, $famiy:sans-serif){
+      font :{
+        style : $style;
+        weight: $weight;
+        size: $size;
+        family: $family;
+      }
+    }
+
+    //매개변수 순서와 개수에 맞게 전달
+    div{
+      $font-values:italic, bold, 16px, sans-serif;
+      @include font($font-values...);
+    }
+
+    //필요한 값만 키워드 인수로 변수에 담아 전달
+    span{
+      $font-values: (style:italic, size:22px);
+      @include font($font-values...);
+    }
+    //필요한 값만 키워드 인수로 전달
+    a{
+      @include font((weight:900, family:monospace)...);
+    }
+  ```
 - 벤더 프리픽스에 활용하여 사용
   - 크롬/사파리 `-webkit-`
   - 파이어폭스 `-moz-`
@@ -465,7 +660,7 @@
   }
 ```
 - **@content** : mixin에 정의되지 않은 값을 추가할때 사용 (★응용고민해보기)
-```
+```scss
   /*SASS*/
   @mixin conbox{
     header{ height: 100px;
@@ -477,13 +672,13 @@
     #logo{ border:1px solid red; }
   }
 ```
-```
+```css
   /*CSS*/
     header{ height: 100px;}
     header #logo{ border:1px solid red; }
   }
 ```
-```
+```scss
   @mixin txt($weight){
     color: white;
     @if $weight == bold {font-weight:bold;}
