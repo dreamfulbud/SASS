@@ -459,11 +459,30 @@
     @else {font-weight:normal;}  
   }
 ```
+```scss
+  @mixin positionCenter($w, $h, $p: absolute){
+    @if(
+      $p == absolute 
+      or $p == fixed
+      or not $p == relative
+      or not $p == static
+    ){
+      width: if(unitless($w), #{$w}px, $w); //unitless : 단위 유무 확인
+      width: if(unitless($h), #{$h}px, $h);
+      position: $p;
+      top:0;
+      bottom:0;
+      left:0;
+      right:0;
+      margin:auto;
+    }
+  }
+```
 
 3. **@for**
 - 시작과 끝이 있는 구문
 - `@for $var from <start> through <end>`
-  ```css
+  ```scss
     /*SASS*/
     @for $i from 1 though 3{
       .col#{$i} { width:(100/5*$i)+px; }
@@ -475,6 +494,18 @@
     .col2 { width:40px; }
     .col3 { width:60px; }
   ```
+- `@for $var from <start> to <end>`  
+  ```scss
+    /*SASS*/
+    @for $i from 1 to 3{
+      .col#{$i} { width:(100/5*$i)+px; }
+    }
+  ```
+  ```css
+    /*CSS*/
+    .col1 { width:20px; }
+    .col2 { width:40px; }
+  ```
 
 4. **@each**
 - 여러 개의 값을 변수에 각각 대입하는 것을 의미
@@ -484,18 +515,48 @@
   @eash $usr in hj, js, yj{
     .#{$usr}-img{ background-image: url('/img/#{$usr}.png'); }
   }
-
-  /*map 속성이용*/
-  $map : (usr1:hj, usr2:js, usr3:yj);
-  @each $key, $usr in $map{
-    .#{$usr}-img{ background-image: url('/img/#{$usr}.png'); }
-  }
 ```
 ```css
   /*CSS*/
   .hj-img { background-image: url('/img/hj.png'); }
   .js-img { background-image: url('/img/js.png'); }
   .yj-img { background-image: url('/img/yj.png'); }
+```
+
+```scss
+  /*map 속성이용*/
+  $map : (usr1:hj, usr2:js, usr3:yj);
+
+  @each $key, $usr in $map{
+      $map--key-list : map-keys($map);  
+      //map-keys() : key값의 리스트 반환 
+      //map-value() : value값의 리스트 반환
+      
+      $index : index($map--key-list, $key); 
+      //index(list, value) : 리스트에서 특정값이 몇번째인지 반환
+      
+      .#{$usr}-img{ 
+          width:100px * $index;
+          background-image: url('/img/#{$usr}.png'); 
+      }
+  }
+```
+```css
+  /*CSS*/
+  .hj-img {
+    width: 100px;
+    background-image: url("/img/hj.png");
+  }
+
+  .js-img {
+    width: 200px;
+    background-image: url("/img/js.png");
+  }
+
+  .yj-img {
+    width: 300px;
+    background-image: url("/img/yj.png");
+  }
 ```
 
 - `@each`는 한 개 이상의 변수값을 지정할 수 있음.
@@ -527,6 +588,7 @@
 
 5. **@while**
 - 어떠한 조건을 충족할 때까지 값을 반복하는 것을 의미
+- 무한 루프에 빠질 수 있음으로 주의할 것!
 ```scss
   $i:1;
   @while $i <5{
@@ -698,3 +760,35 @@
 2. Expand : 가장 보기에 좋은 결과물.
 3. Compact : CSS 속성을 한줄에 보여줌.
 4. Compressed : **.min.** 형태
+
+---
+
+## Sass 내장함수
+- https://sass-lang.com/documentation/modules
+- `[]`는 선택 가능한 인수
+- Zero-based numbering을 사용하지 않음.
+
+### 색상 함수
+- `mix($color1, $color2)` : 두개의 색을 섞음
+- `lighten($color, $amount)` : 더 밝게
+- `darken($color, $amount)` : 더 어둡게
+- `invert($color)` : 색상 반전.
+- `rgba($color, $alpha)` : 투명도 변경
+- `opacify($color, $amount)` / `fade-in($color, $amount)` : 더 불투명하게
+- `transparentize($color, $amount)` / `fade-out($color, $amount)`: 더 투명하게
+
+### 문자 함수
+- `unquote($string)` : 따옴표 제거
+- `quote($string)` : 따옴표 추가
+- `str-slice($string, $start-at, [$end-at])` : 문자에서 특정 문자(몇 번째 글자부터 몇 번째 글자까지) 추출
+
+### Map 함수
+- `map-keys($map)` : Map에서 모든 key값을 리스트로 반환
+- `map-value($map)` : Map에서 모든 value값을 리스트로 반환
+
+### 관리(Introspection) 함수
+- `unit($number)` : 숫자 단위 반환
+- `unitless($number)` : 숫자에 단위 유무 반환
+
+
+
